@@ -267,7 +267,7 @@ def run_training(data_file = '', checkpoint_file = ''):
             embeddings[k] = embeddings_dict[v]
 
         else: #如果在词向量字典中找不到对应的词向量则随机生成
-	    missing_count += 1
+    	    missing_count += 1
             print('can not find k, v in dict: ', k, v)
             embeddings[k] = np.array(np.random.uniform(-1.0, 1.0,size=[FLAGS.embedding_dim]),dtype=np.float32)
 
