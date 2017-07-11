@@ -120,7 +120,7 @@ tf.flags.DEFINE_string("embedding_file", "./ieee_zhihu_cup/word_embedding.txt", 
 # 词向量长度
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 256)")
 # 卷积核大小
-tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
+tf.flags.DEFINE_string("filter_sizes", "1,2,3,4,5,6,7", "Comma-separated filter sizes (default: '3,4,5')")
 # 每一种卷积核个数
 tf.flags.DEFINE_integer("num_filters", 1024, "Number of filters per filter size (default: 1024)")
 # dropout参数
@@ -258,6 +258,7 @@ def run_training(data_file = '', checkpoint_file = ''):
 
     # embeddings[0] = np.zeros(256, dtype=np.float32)    #第0行置0
 
+    missing_count = 0
     # for i in  tqdm(xrange(len(vocab_dict)-1)):
     for k, v in tqdm(vocab_dict.items()):
         #如果字典vocab_dict的词在embeddings_dict词典中出现则按照其对应的词序添加进embeddings词向量
@@ -266,7 +267,11 @@ def run_training(data_file = '', checkpoint_file = ''):
             embeddings[k] = embeddings_dict[v]
 
         else: #如果在词向量字典中找不到对应的词向量则随机生成
+	    missing_count += 1
+            print('can not find k, v in dict: ', k, v)
             embeddings[k] = np.array(np.random.uniform(-1.0, 1.0,size=[FLAGS.embedding_dim]),dtype=np.float32)
+
+    print("missing_count:", missing_count)
 
     # embeddings=np.array(embeddings)
     print("embeddings.shape:",embeddings.shape)
@@ -361,7 +366,7 @@ def run_training(data_file = '', checkpoint_file = ''):
         
     # 定义loss
     with tf.name_scope("loss"):
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=scores, labels=input_y))
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=scores, labels=input_y))
     
     # 定义优化器
     with tf.name_scope("optimizer"):

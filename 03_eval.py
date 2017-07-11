@@ -126,6 +126,7 @@ embeddings_dict=load_embedding_dict(embedding_file)
 
 embeddings = np.zeros([len(vocab_dict), 256], dtype=np.float32)
 
+missing_count = 0
 # for i in  tqdm(xrange(len(vocab_dict)-1)):
 for k, v in tqdm(vocab_dict.items()):
     #如果字典vocab_dict的词在embeddings_dict词典中出现则按照其对应的词序添加进embeddings词向量
@@ -134,9 +135,11 @@ for k, v in tqdm(vocab_dict.items()):
         embeddings[k] = embeddings_dict[v]
 
     else: #如果在词向量字典中找不到对应的词向量则随机生成
+	missing_count += 1
         print('can not find in embedding dict: ', k, v)
         embeddings[k] = np.array(np.random.uniform(-1.0, 1.0,size=[256]),dtype=np.float32)
 
+print("missing count: ", missing_count)
 print("embeddings.shape:",embeddings.shape)
 print(embeddings[0:3])
 
@@ -257,7 +260,7 @@ with tf.name_scope("output"):
 
 
 # 选择模型
-checkpoint_file = "./models/model-10000"
+checkpoint_file = "./models/model-42450"
     
 with tf.Session() as sess:
     predict_top_5 = tf.nn.top_k(scores, k=5)
