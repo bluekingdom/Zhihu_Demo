@@ -37,6 +37,9 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
     print("num_batches_per_epoch:",num_batches_per_epoch)
     for epoch in range(num_epochs):
         # Shuffle the data at each epoch
+
+        print("epoch: ", epoch)
+
         if shuffle:
             shuffle_indices = np.random.permutation(np.arange(data_size))
             shuffled_data = data[shuffle_indices]
@@ -80,7 +83,7 @@ def eval(predict_label_and_marked_label_list):
         precision += ((right_num / float(sample_num))) / math.log(2.0 + pos)  # 下标0-4 映射到 pos1-5 + 1，所以最终+2
     recall = float(right_label_num) / all_marked_label_num
 
-    return 2*(precision * recall) / (precision + recall )
+    return 1*(precision * recall) / (precision + recall )
 #------------------------------------------endding define function-------------------------------------------#
 
 
@@ -120,15 +123,20 @@ print("len(vocab_dict):",len(vocab_dict))
 #构建与vocab_dict相对应的word embeddings(shape=[vocab_size, embedding_size])
 embedding_file="./ieee_zhihu_cup/word_embedding.txt"
 embeddings_dict=load_embedding_dict(embedding_file)
-embeddings=[]
-for i in  tqdm(xrange(len(vocab_dict))):
+
+embeddings = np.zeros([len(vocab_dict), 256], dtype=np.float32)
+
+# for i in  tqdm(xrange(len(vocab_dict)-1)):
+for k, v in tqdm(vocab_dict.items()):
     #如果字典vocab_dict的词在embeddings_dict词典中出现则按照其对应的词序添加进embeddings词向量
-    if vocab_dict[i] in embeddings_dict:    
-        embeddings.append(embeddings_dict[vocab_dict[i]])
-    #如果在词向量字典中找不到对应的词向量则随机生成
-    else:
-        embeddings.append(np.array(np.random.uniform(-1.0, 1.0,size=[FLAGS.embedding_dim]),dtype=np.float32))
-embeddings=np.array(embeddings)
+    # if vocab_dict[i+1] in embeddings_dict:    
+    if v in embeddings_dict:    
+        embeddings[k] = embeddings_dict[v]
+
+    else: #如果在词向量字典中找不到对应的词向量则随机生成
+        print('can not find in embedding dict: ', k, v)
+        embeddings[k] = np.array(np.random.uniform(-1.0, 1.0,size=[256]),dtype=np.float32)
+
 print("embeddings.shape:",embeddings.shape)
 print(embeddings[0:3])
 
