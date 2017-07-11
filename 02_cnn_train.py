@@ -304,7 +304,7 @@ def run_training(data_file = '', checkpoint_file = ''):
     dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
     
     # Embedding layer
-    with tf.device('/cpu:0'), tf.name_scope("embedding"):
+    with tf.device('/gpu:0'), tf.name_scope("embedding"):
         embeddings=tf.Variable(embeddings,trainable=True,name="embeddings")
         #Weights = tf.Variable(tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0), name="Weights")
         ## shape:[None, sequence_length, embedding_size]
@@ -361,7 +361,7 @@ def run_training(data_file = '', checkpoint_file = ''):
         
     # 定义loss
     with tf.name_scope("loss"):
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=scores, labels=input_y))
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=scores, labels=input_y))
     
     # 定义优化器
     with tf.name_scope("optimizer"):
@@ -387,7 +387,7 @@ def run_training(data_file = '', checkpoint_file = ''):
 
         i = 0
         # 生成数据
-        batches = batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+        batches = batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs, True)
         
         for batch in batches:
             i = i + 1
