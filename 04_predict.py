@@ -5,7 +5,26 @@ import pandas as pd
 from tqdm import tqdm
 import re
 import numpy as np
+import tensorflow as tf
+import os
 from six.moves import xrange
+
+tf.flags.DEFINE_string("predict_txt", "", "")
+
+
+FLAGS = tf.flags.FLAGS
+FLAGS._parse_flags()
+
+predict_txt_file = FLAGS.predict_txt
+if False == os.path.exists(predict_txt_file):
+    print("predict file do not exists: " + predict_txt_file)
+    sys.exit()
+
+# 打印所有参数
+print("\nParameters:")
+for attr, value in sorted(FLAGS.__flags.items()):
+    print("{}={}".format(attr.upper(), value))
+print("")
 
 
 # In[2]:
@@ -24,7 +43,7 @@ for i in xrange(topic_info.shape[0]):
 
 # In[4]:
 
-predict = open('predict.txt', "r")
+predict = open(predict_txt_file, "r")
 examples = predict.readlines()
 text = np.array([line.split(" ") for line in examples])
 

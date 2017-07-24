@@ -4,4 +4,7 @@ models/*
 *.csv
 vocab_dict
 *.txt
-
+*.pyc
+preprocess
+*.bak
+test*

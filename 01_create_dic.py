@@ -5,6 +5,16 @@ from tqdm import tqdm # pip install tqdm
 from six.moves import xrange
 
 reader = pd.read_table('./ieee_zhihu_cup/question_train_set.txt',sep='\t',header=None)
+# print(reader.iloc[0:5])
+
+eval_reader = pd.read_table('./ieee_zhihu_cup/question_eval_set.txt',sep='\t',header=None)
+
+# 导入question_topic_eval_set
+topic_reader = pd.read_table('./ieee_zhihu_cup/question_topic_train_set.txt',sep='\t',header=None)
+# print(topic_reader.iloc[0:5])
+
+# 导入topic_info
+label_reader = pd.read_table('./ieee_zhihu_cup/topic_info.txt',sep='\t',header=None)
 
 words = reader.iloc[:, 2]
 
