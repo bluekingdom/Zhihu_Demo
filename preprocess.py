@@ -114,9 +114,9 @@ def build_id2wordIDset_dict(reader, id_idx, word_idx, id2wordset_dict):
     print('process finish!\n')
     return
 
-# train_reader = pd.read_table('./ieee_zhihu_cup/question_train_set.txt',sep='\t',header=None)
+train_reader = pd.read_table('./ieee_zhihu_cup/question_train_set.txt',sep='\t',header=None)
 
-# eval_reader = pd.read_table('./ieee_zhihu_cup/question_eval_set.txt',sep='\t',header=None)
+eval_reader = pd.read_table('./ieee_zhihu_cup/question_eval_set.txt',sep='\t',header=None)
 
 # question_topic_reader = pd.read_table('./ieee_zhihu_cup/question_topic_train_set.txt',sep='\t',header=None)
 
@@ -124,31 +124,33 @@ topic_info_reader = pd.read_table('./ieee_zhihu_cup/topic_info.txt',sep='\t',hea
 
 words_count_dict = load_var('words_count_dict')
 
-# if words_count_dict == None:
-#     words_count_dict = {}
+if words_count_dict == None:
+    words_count_dict = {}
 
-#     calc_words_count(train_reader, [2, 4], words_count_dict)
-#     calc_words_count(eval_reader, [2, 4], words_count_dict)
-#     calc_words_count(topic_info_reader, [3, 5], words_count_dict)
+    calc_words_count(train_reader, [2, 4], words_count_dict)
+    calc_words_count(eval_reader, [2, 4], words_count_dict)
+    calc_words_count(topic_info_reader, [3, 5], words_count_dict)
 
-#     save_var('words_count_dict', words_count_dict)
+    save_var('words_count_dict', words_count_dict)
 
-#     sort_word_counts = sorted(words_count_dict.items(), key=lambda t: t[1], reverse=False)
+    sort_word_counts = sorted(words_count_dict.items(), key=lambda t: t[1], reverse=False)
 
-#     fp = open('words_count.txt', 'w+')
-#     total_count = len(sort_word_counts)
-#     fp.write('total count: %10d\n' % total_count)
-#     for item in sort_word_counts:
+    save_var('sort_word_counts', sort_word_counts)
 
-#         fp.write('%-10s: %10d' % (item[0], item[1]))
-#         fp.write('\n')
-#     fp.close()
-#     pass
+    fp = open('words_count.txt', 'w+')
+    total_count = len(sort_word_counts)
+    fp.write('total count: %10d\n' % total_count)
+    for item in sort_word_counts:
+
+        fp.write('%-10s: %10d' % (item[0], item[1]))
+        fp.write('\n')
+    fp.close()
+    pass
 
 words_to_id_dict = {item[0]: int(i) for i, item in enumerate(words_count_dict.items())}
 id_to_words_dict = {v: k for k, v in words_to_id_dict.items()}
 
-topicId_to_quesIDset_dict = load_var('topicId_to_quesIDset_dict')
+# topicId_to_quesIDset_dict = load_var('topicId_to_quesIDset_dict')
 
 # if topicId_to_quesIDset_dict == None:
 
@@ -182,33 +184,33 @@ topicId_to_quesIDset_dict = load_var('topicId_to_quesIDset_dict')
 #     build_id2wordIDset_dict(train_reader, 0, [2, 4], quesID_to_wordIDset_dict)
 #     save_var('quesID_to_wordIDset_dict', quesID_to_wordIDset_dict)
 
-topicID_to_wordIDset_dict = load_var('topicID_to_wordIDset_dict')
-if topicID_to_wordIDset_dict == None:
-    topicID_to_wordIDset_dict = {}
-    build_id2wordIDset_dict(topic_info_reader, 0, [3, 5], topicID_to_wordIDset_dict)
-    save_var('topicID_to_wordIDset_dict', topicID_to_wordIDset_dict)
+# topicID_to_wordIDset_dict = load_var('topicID_to_wordIDset_dict')
+# if topicID_to_wordIDset_dict == None:
+#     topicID_to_wordIDset_dict = {}
+#     build_id2wordIDset_dict(topic_info_reader, 0, [3, 5], topicID_to_wordIDset_dict)
+#     save_var('topicID_to_wordIDset_dict', topicID_to_wordIDset_dict)
 
-topicID_to_infoComWord_Freq_Count_dict = {}
+# topicID_to_infoComWord_Freq_Count_dict = {}
 
-sort_topicID_to_wordIDset = sorted(topicID_to_wordIDset_dict.items(), key=lambda t: len(t[1].keys()), reverse=True)
-fp = open('topicID_to_infoComWord_Freq_Count.txt', 'w+')
-for item in tqdm(sort_topicID_to_wordIDset):
-    topic_id = item[0]
-    wordID_freq = item[1]
+# sort_topicID_to_wordIDset = sorted(topicID_to_wordIDset_dict.items(), key=lambda t: len(t[1].keys()), reverse=True)
+# fp = open('topicID_to_infoComWord_Freq_Count.txt', 'w+')
+# for item in tqdm(sort_topicID_to_wordIDset):
+#     topic_id = item[0]
+#     wordID_freq = item[1]
     
-    sort_wordID_freq = sorted(wordID_freq.items(), key=lambda t: t[1], reverse=True)
+#     sort_wordID_freq = sorted(wordID_freq.items(), key=lambda t: t[1], reverse=True)
 
-    fp.write('topic id: %10d, word count: %d\n' % (topic_id, len(sort_wordID_freq)))
+#     fp.write('topic id: %10d, word count: %d\n' % (topic_id, len(sort_wordID_freq)))
 
-    for wid_f in sort_wordID_freq:
-        wid = wid_f[0]
-        freq = wid_f[1]
-        word = id_to_words_dict[wid]
-        count = words_count_dict[word]
-        fp.write('w: %10s, f: %10d, c: %10d\n' % (word, freq, count))
-    pass
-    fp.write('\n')
-fp.close()
+#     for wid_f in sort_wordID_freq:
+#         wid = wid_f[0]
+#         freq = wid_f[1]
+#         word = id_to_words_dict[wid]
+#         count = words_count_dict[word]
+#         fp.write('w: %10s, f: %10d, c: %10d\n' % (word, freq, count))
+#     pass
+#     fp.write('\n')
+# fp.close()
 
 # topicID_to_comWordSet_Count_dict = {}
 
