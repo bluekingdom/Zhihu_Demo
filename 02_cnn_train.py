@@ -104,6 +104,7 @@ def run_training(data_file = '', checkpoint_file = ''):
         data_ind += 1
         pass
 
+    print('max_document_length: ', max_document_length)
     #释放内存
     #reader = None
     del reader
