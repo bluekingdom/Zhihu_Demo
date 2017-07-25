@@ -6,6 +6,7 @@ class TextLSTM(object):
 
     def __init__(self, sequence_length, num_classes, vocab_size,
       embeddings, l2_reg_lambda=0.0):
+    	print('using TextLSTM.')
 
         embedding_size = embeddings.shape[1]
 
@@ -13,6 +14,7 @@ class TextLSTM(object):
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.is_train = tf.placeholder(tf.bool, name='is_train') 
 
         # Keeping track of l2 regularization loss (optional)
         l2_loss = tf.constant(0.0)
@@ -25,7 +27,7 @@ class TextLSTM(object):
             embedded_chars = tf.nn.embedding_lookup(embeddings, self.input_x)
 
         with tf.name_scope('lstm'):
-        	x = tf.ubstack(embedded_chars, sequence_length, 1)
+        	x = tf.unstack(embedded_chars, sequence_length, 1)
         	lstm_cell = rnn.BasicLSTMCell(embedding_size, forget_bias=1.0)
 
         	outputs, states = rnn.static_rnn(lstm_cell, x, dtype=tf.float32)
@@ -39,7 +41,7 @@ class TextLSTM(object):
             b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
             l2_loss += tf.nn.l2_loss(W)
             l2_loss += tf.nn.l2_loss(b)
-            output = tf.nn.xw_plus_b(h_drop, W, b, name="scores")
+            output = tf.nn.xw_plus_b(lstm_output, W, b, name="scores")
             self.scores = tf.nn.sigmoid(output)
 
         with tf.name_scope("loss"):

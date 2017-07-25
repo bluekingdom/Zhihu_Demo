@@ -153,11 +153,12 @@ def run_training(data_file = '', checkpoint_file = ''):
 
     #---------------------------------------------define network---------------------------------------------#
     # net = TextCNN_normal(sequence_length, num_classes, vocab_size, embeddings, l2_reg_lambda)
-    net = TextCNN_normal(sequence_length, num_classes, vocab_size, embeddings, l2_reg_lambda)
+    net = TextLSTM(sequence_length, num_classes, vocab_size, embeddings, l2_reg_lambda)
 
     # 定义优化器
     with tf.name_scope("optimizer"):
-        optimizer = tf.train.AdamOptimizer(FLAGS.lr).minimize(net.loss)
+        # optimizer = tf.train.AdamOptimizer(FLAGS.lr).minimize(net.loss)
+        optimizer = tf.train.RMSPropOptimizer(FLAGS.lr).minimize(net.loss)
         # optimizer = tf.train.GradientDescentOptimizer(FLAGS.lr).minimize(net.loss)
  
     # 定义saver，只保存最新的5个模型
