@@ -28,7 +28,8 @@
 import pandas as pd
 from tqdm import tqdm # pip install tqdm
 from six.moves import xrange
-from utils import load_embedding_dict
+from utils import load_embedding_dict, load_var, save_var
+import sys
 
 
 # In[2]:
@@ -66,129 +67,138 @@ def calc_eval_word_counts(words):
         else:
             eval_word_counts[w] = 1
 
-max_count_of_topic_words = 0
-for i in tqdm(xrange(label_reader.shape[0])):
-    words_str = label_reader.iloc[i][3]
-    desc_str = label_reader.iloc[i][5]
-    words = []
-    desc = []
-    try:
-        if type(words_str) == str:
-            words = words_str.split(',')
-        if type(desc_str) == str:
-            desc = desc_str.split(',')
+sort_word_counts = load_var('sort_word_counts', temp_folder='preprocess')
 
-        calc_word_counts(words)
-        calc_word_counts(desc)
+if sort_word_counts == None:
+    print('sort word counts file not exists!')
+    sys.exit()
 
-        f_words = [w for w in words if w not in ['w11', 'w6', 'w111']]
+filter_word_list = [item[0] for item in sort_word_counts[-10:]]
+print('filter word list: ', filter_word_list)
 
-        if len(f_words) == 0:
-            words = desc
+# max_count_of_topic_words = 0
+# for i in tqdm(xrange(label_reader.shape[0])):
+#     words_str = label_reader.iloc[i][3]
+#     desc_str = label_reader.iloc[i][5]
+#     words = []
+#     desc = []
+#     try:
+#         if type(words_str) == str:
+#             words = words_str.split(',')
+#         if type(desc_str) == str:
+#             desc = desc_str.split(',')
 
-        max_count_of_topic_words = max(max_count_of_topic_words, len(words))
-        pass
-    except Exception as e:
-        print('error line: ', words_str, desc_str)
-        print(i, e)
-    pass
+#         calc_word_counts(words)
+#         calc_word_counts(desc)
 
-print('max count of topic words: ', max_count_of_topic_words)
-# 2017.07.22 max_count_of_topic_words = 11
+#         f_words = [w for w in words if w not in filter_word_list]
 
-max_count_of_eval_data_words = 0
-for i in tqdm(xrange(eval_reader.shape[0])):
-    title_words = []
-    desc_words = []
+#         if len(f_words) == 0:
+#             words = desc
 
-    data = eval_reader.iloc[i][2]
-    desc = eval_reader.iloc[i][4]
+#         max_count_of_topic_words = max(max_count_of_topic_words, len(words))
+#         pass
+#     except Exception as e:
+#         print('error line: ', words_str, desc_str)
+#         print(i, e)
+#     pass
 
-    if type(data) == str:
-        title_words = data.split(',')
+# print('max count of topic words: ', max_count_of_topic_words)
+# # 2017.07.22 max_count_of_topic_words = 11
 
-    if type(desc) == str:
-        desc_words = desc.split(',')
+# max_count_of_eval_data_words = 0
+# for i in tqdm(xrange(eval_reader.shape[0])):
+#     title_words = []
+#     desc_words = []
 
-    calc_word_counts(title_words)
-    calc_word_counts(desc_words)
+#     data = eval_reader.iloc[i][2]
+#     desc = eval_reader.iloc[i][4]
 
-    calc_eval_word_counts(title_words)
-    calc_eval_word_counts(desc_words)
+#     if type(data) == str:
+#         title_words = data.split(',')
 
-    if type(data) != str and type(desc) != str:
-        print('word be filtered: ', title_words, desc_words)
-        continue
+#     if type(desc) == str:
+#         desc_words = desc.split(',')
 
-    filter_words = []
-    for w in title_words:
-        if w not in ['w11', 'w6', 'w111']:
-            filter_words.append(w)
-            pass
-        pass
+#     calc_word_counts(title_words)
+#     calc_word_counts(desc_words)
 
-    if len(filter_words) == 0:
-        for w in desc_words:
-            if w not in ['w11', 'w6', 'w111']:
-                filter_words.append(w)
-                pass
-            pass
+#     calc_eval_word_counts(title_words)
+#     calc_eval_word_counts(desc_words)
+
+#     if type(data) != str and type(desc) != str:
+#         print('word be filtered: ', title_words, desc_words)
+#         continue
+
+#     filter_words = []
+#     for w in title_words:
+#         if w not in filter_word_list:
+#             filter_words.append(w)
+#             pass
+#         pass
+
+#     if len(filter_words) == 0:
+#         for w in desc_words:
+#             if w not in filter_word_list:
+#                 filter_words.append(w)
+#                 pass
+#             pass
             
-    max_count_of_eval_data_words = max(max_count_of_eval_data_words, len(filter_words))
+#     max_count_of_eval_data_words = max(max_count_of_eval_data_words, len(filter_words))
 
-    if len(filter_words) == 0:
-        print('word be filtered: ', title_words, desc_words)
+#     if len(filter_words) == 0:
+#         print('word be filtered: ', title_words, desc_words)
 
-print('max count of eval data words: ', max_count_of_eval_data_words)
-# 2017.07.22 max_count_of_eval_data_words = 70
+# print('max count of eval data words: ', max_count_of_eval_data_words)
+# # 2017.07.22 max_count_of_eval_data_words = 70
 
 
 # 合并title 的词语编号序列和话题 id
 data_topic = pd.concat([reader.ix[:,2], topic_reader.ix[:,1]], axis=1, ignore_index=True)
 # print(data_topic.iloc[0:5])
 
-max_count_of_data_words = 0
+# max_count_of_data_words = 0
 
-for i in tqdm(xrange(data_topic.shape[0])):
-    title_words = []
-    desc_words = []
+# for i in tqdm(xrange(data_topic.shape[0])):
+#     title_words = []
+#     desc_words = []
 
-    data = data_topic.iloc[i][0]
-    desc = reader.iloc[i][4]
+#     data = data_topic.iloc[i][0]
+#     desc = reader.iloc[i][4]
 
-    if type(data) == str:
-        title_words = data.split(',')
+#     if type(data) == str:
+#         title_words = data.split(',')
 
-    if type(desc) == str:
-        desc_words = desc.split(',')
+#     if type(desc) == str:
+#         desc_words = desc.split(',')
 
-    calc_word_counts(title_words)
-    calc_word_counts(desc_words)
+#     calc_word_counts(title_words)
+#     calc_word_counts(desc_words)
 
-    if type(data) != str and type(desc) != str:
-        print('word be filtered: ', title_words, desc_words, data_topic.iloc[i][1])
-        continue
+#     if type(data) != str and type(desc) != str:
+#         print('word be filtered: ', title_words, desc_words, data_topic.iloc[i][1])
+#         continue
 
-    filter_words = []
-    for w in title_words:
-        if w not in ['w11', 'w6', 'w111']:
-            filter_words.append(w)
-            pass
-        pass
+#     filter_words = []
+#     for w in title_words:
+#         if w not in filter_word_list:
+#             filter_words.append(w)
+#             pass
+#         pass
 
-    if len(filter_words) == 0:
-        for w in desc_words:
-            if w not in ['w11', 'w6', 'w111']:
-                filter_words.append(w)
-                pass
-            pass
+#     if len(filter_words) == 0:
+#         for w in desc_words:
+#             if w not in filter_word_list:
+#                 filter_words.append(w)
+#                 pass
+#             pass
 
-    max_count_of_data_words = max(max_count_of_data_words, len(filter_words))
+#     max_count_of_data_words = max(max_count_of_data_words, len(filter_words))
 
-    if len(filter_words) == 0:
-        print('word be filtered: ', title_words, desc_words, data_topic.iloc[i][1])
+#     if len(filter_words) == 0:
+#         print('word be filtered: ', title_words, desc_words, data_topic.iloc[i][1])
 
-print('max count of data words: ', max_count_of_data_words)
+# print('max count of data words: ', max_count_of_data_words)
 
 # 把标签转为0-1998的编号
 print('begin to processing label')
@@ -203,116 +213,73 @@ topic_dict = {}
 for i,label in enumerate(my_labels):
     topic_dict[label] = i
 
-# print(topic_dict[7739004195693774975])
-
-embedding_dict = load_embedding_dict('ieee_zhihu_cup/word_embedding.txt')
+# embedding_dict = load_embedding_dict('ieee_zhihu_cup/word_embedding.txt')
 
 print('begin to process words')
 data_idx = [True] * data_topic.shape[0]
 
-
-# for i in tqdm(xrange(data_topic.shape[0])):
-#     try:
-#         words = data_topic.iloc[i][0].split(',')
-
-#         for w in words:
-#             # print(w)
-#             if word_counts.has_key(w):
-#                 word_counts[w] += 1
-#             else:
-#                 word_counts[w] = 1
-#         pass
-#     except Exception as e:
-#         data_idx[i] = False
-#         print("this row can not split:",data_topic.iloc[i][0])
-#         print(i, e)
-
-sort_word_counts = sorted(word_counts.items(), key=lambda t: t[1], reverse=False)
-
-fcount = 10
-# print(sort_word_counts[-fcount:])
-# print(sort_word_counts)
-fp = open('words_count.txt', 'w+')
-total_count = len(sort_word_counts)
-fp.write('total count: \t%d\n' % total_count)
-for item in sort_word_counts:
-
-    if item[0] not in eval_word_counts:
+for i in tqdm(xrange(data_topic.shape[0])):
+    if data_idx[i] == False:
         continue
 
-    fp.write('%s: \t%d' % (item[0], item[1]))
-    fp.write(' \t%d' % eval_word_counts[item[0]])
-    if item[0] in embedding_dict:
-        fp.write(' \t1')
-    fp.write('\n')
-fp.close()
+    title_words = []
+    desc_words = []
 
-# for item in sort_word_counts[-fcount:]:
-#     del word_counts[item[0]]
+    data = data_topic.iloc[i][0]
+    desc = reader.iloc[i][4]
 
-# max_count_of_data_words = 0
+    if type(data) == str:
+        title_words = data.split(',')
 
-# for i in tqdm(xrange(data_topic.shape[0])):
-#     if data_idx[i] == False:
-#         continue
+    if type(desc) == str:
+        desc_words = desc.split(',')
 
-#     title_words = []
-#     desc_words = []
+    if type(data) != str and type(desc) != str:
+        data_idx[i] = False
+        print("this row has error:", reader.iloc[i])
+        continue
 
-#     data = data_topic.iloc[i][0]
-#     desc = reader.iloc[i][4]
+    filter_words = []
+    for w in title_words:
+        # if w in embedding_dict and w in word_counts:
+        if w not in filter_word_list:
+            filter_words.append(w)
+            pass
+        pass
 
-#     if type(data) == str:
-#         title_words = data.split(',')
+    if len(filter_words) == 0:
+        print('consider desc words: ', title_words, desc_words)
+        for w in desc_words:
+            if w not in filter_word_list:
+                filter_words.append(w)
+                pass
+            pass
 
-#     if type(desc) == str:
-#         desc_words = desc.split(',')
+    if len(filter_words) == 0:
+        print('all word be filtered: ', title_words, desc_words)
+        data_topic.iloc[i][0] = ','.join(title_words)
+        # data_idx[i] = False
+    else:
+        data_topic.iloc[i][0] = ','.join(filter_words)
 
-#     if type(data) != str and type(desc) != str:
-#         data_idx[i] = False
-#         print("this row has error:", reader.iloc[i])
-#         continue
+    # 根据“,”切分话题id
+    new_label = ''
+    temp_topic = data_topic.iloc[i][1].split(',')
+    if len(temp_topic) != 0:
+        for topic in temp_topic:
+            # 判断该label是否在label文件中，并得到该行
+            label_num = topic_dict[int(topic)]
+            new_label = new_label + str(label_num) + ','
+        data_topic.iloc[i][1] = new_label[:-1]
+    else:
+        print('label be filtered: ', temp_topic)
+        data_idx[i] = False
 
-#     filter_words = []
-#     for w in title_words:
-#         # if w in embedding_dict and w in word_counts:
-#         if w not in ['w11', 'w6', 'w111']:
-#             filter_words.append(w)
-#             pass
-#         pass
+data_topic = data_topic.iloc[data_idx][:]
 
-#     if len(filter_words) == 0:
-#         print('use desc words: ', title_words, desc_words)
-#         for w in desc_words:
-#             if w not in ['w11', 'w6', 'w111']:
-#                 filter_words.append(w)
-#                 pass
-#             pass
+print(data_topic.iloc[:5])
 
-#     if len(filter_words) == 0:
-#         print('word be filtered: ', title_words, desc_words)
-#         data_idx[i] = False
-#     else:
-#         data_topic.iloc[i][0] = ','.join(filter_words)
-
-#     # 根据“,”切分话题id
-#     new_label = ''
-#     temp_topic = data_topic.iloc[i][1].split(',')
-#     if len(temp_topic) != 0:
-#         for topic in temp_topic:
-#             # 判断该label是否在label文件中，并得到该行
-#             label_num = topic_dict[int(topic)]
-#             new_label = new_label + str(label_num) + ','
-#         data_topic.iloc[i][1] = new_label[:-1]
-#     else:
-#         print('label be filtered: ', temp_topic)
-#         data_idx[i] = False
-
-# data_topic = data_topic.iloc[data_idx][:]
-
-# print(data_topic.iloc[:5])
-
-# data_topic.to_csv("./ieee_zhihu_cup/data_topic.txt", header=None, index=None, sep='\t')
+data_topic.to_csv("./ieee_zhihu_cup/data_topic.txt", header=None, index=None, sep='\t')
 
 # 切分成10块保存
 # for i in xrange(10):
