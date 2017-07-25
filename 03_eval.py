@@ -30,6 +30,14 @@ for attr, value in sorted(FLAGS.__flags.items()):
     print("{}={}".format(attr.upper(), value))
 print("")
 
+sort_word_counts = load_var('sort_word_counts', temp_folder='preprocess')
+
+if sort_word_counts == None:
+    print('sort word counts file not exists!')
+    sys.exit()
+
+filter_word_list = [item[0] for item in sort_word_counts[-10:]]
+print('filter word list: ', filter_word_list)
 
 # 导入question_train_set
 reader = pd.read_table('./ieee_zhihu_cup/question_eval_set.txt',sep='\t',header=None)
@@ -41,29 +49,48 @@ x_text = np.zeros([reader.shape[0]], dtype=np.object)
 
 # for i,line in enumerate(x_text):
 for i in tqdm(xrange(reader.shape[0])):
-    line = reader.iloc[i, 2]
-    try:
-        temp = line.split(',')
-        f_temp = []
-        for w in temp:
-            if w not in ['w11', 'w6', 'w111']:
-                f_temp.append(w)
+
+    title_words = []
+    desc_words = []
+
+    data = reader.iloc[i][2]
+    desc = reader.iloc[i][4]
+
+    if type(data) == str:
+        title_words = data.split(',')
+
+    if type(desc) == str:
+        desc_words = desc.split(',')
+
+    if type(data) != str and type(desc) != str:
+        x_text[i] = data
+        continue
+
+    filter_words = []
+    for w in title_words:
+        if w not in filter_word_list:
+            filter_words.append(w)
+            pass
+        pass
+
+    if len(filter_words) == 0:
+        for w in desc_words:
+            if w not in filter_word_list:
+                filter_words.append(w)
                 pass
             pass
-        if len(f_temp) != 0:
-            x_text[i] = ','.join(f_temp)
-            temp = f_temp
-        else:
-            print('data error: ', temp)
-            x_text[i] = line
 
-        max_document_length = max(max_document_length,len(temp))
+    if len(filter_words) == 0:
+        continue
+        
+    elif len(filter_words) > 70:
+        print(filter_words)
+        filter_words = filter_words[0:70]
 
-    except Exception as e:
-        print(i, e)
-        x_text[i] = line
-        # 其中有一行数据为空
-        pass
+    x_text[i] = ','.join(filter_words)
+
+    max_document_length = max(max_document_length,len(filter_words))
+
 
 print("max_document_length:",max_document_length)
 
