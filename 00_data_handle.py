@@ -29,10 +29,7 @@ import pandas as pd
 from tqdm import tqdm # pip install tqdm
 from six.moves import xrange
 from utils import load_embedding_dict, load_var, save_var
-<<<<<<< HEAD
 import sys
-=======
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 
 # In[2]:
@@ -70,36 +67,14 @@ def calc_eval_word_counts(words):
         else:
             eval_word_counts[w] = 1
 
-<<<<<<< HEAD
 sort_word_counts = load_var('sort_word_counts', temp_folder='preprocess')
-=======
-filter_word_list = load_var('filter_word_list', temp_folder='preprocess')
-if filter_word_list == None:
-    filter_word_list = ['w11', 'w6', 'w111']
-
-max_count_of_topic_words = 0
-for i in tqdm(xrange(label_reader.shape[0])):
-    words_str = label_reader.iloc[i][3]
-    desc_str = label_reader.iloc[i][5]
-    words = []
-    desc = []
-    try:
-        if type(words_str) == str:
-            words = words_str.split(',')
-        if type(desc_str) == str:
-            desc = desc_str.split(',')
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 if sort_word_counts == None:
     print('sort word counts file not exists!')
     sys.exit()
 
-<<<<<<< HEAD
 filter_word_list = [item[0] for item in sort_word_counts[-10:]]
 print('filter word list: ', filter_word_list)
-=======
-        f_words = [w for w in words if w not in filter_word_list]
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 # max_count_of_topic_words = 0
 # for i in tqdm(xrange(label_reader.shape[0])):
@@ -145,17 +120,8 @@ print('filter word list: ', filter_word_list)
 #     if type(desc) == str:
 #         desc_words = desc.split(',')
 
-<<<<<<< HEAD
 #     calc_word_counts(title_words)
 #     calc_word_counts(desc_words)
-=======
-    filter_words = []
-    for w in title_words:
-        if w not in filter_word_list:
-            filter_words.append(w)
-            pass
-        pass
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 #     calc_eval_word_counts(title_words)
 #     calc_eval_word_counts(desc_words)
@@ -213,7 +179,6 @@ data_topic = pd.concat([reader.ix[:,2], topic_reader.ix[:,1]], axis=1, ignore_in
 #         print('word be filtered: ', title_words, desc_words, data_topic.iloc[i][1])
 #         continue
 
-<<<<<<< HEAD
 #     filter_words = []
 #     for w in title_words:
 #         if w not in filter_word_list:
@@ -227,21 +192,6 @@ data_topic = pd.concat([reader.ix[:,2], topic_reader.ix[:,1]], axis=1, ignore_in
 #                 filter_words.append(w)
 #                 pass
 #             pass
-=======
-    filter_words = []
-    for w in title_words:
-        if w not in filter_word_list:
-            filter_words.append(w)
-            pass
-        pass
-
-    if len(filter_words) == 0:
-        for w in desc_words:
-            if w not in filter_word_list:
-                filter_words.append(w)
-                pass
-            pass
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 #     max_count_of_data_words = max(max_count_of_data_words, len(filter_words))
 
@@ -263,68 +213,26 @@ topic_dict = {}
 for i,label in enumerate(my_labels):
     topic_dict[label] = i
 
-<<<<<<< HEAD
 # embedding_dict = load_embedding_dict('ieee_zhihu_cup/word_embedding.txt')
-=======
-embedding_dict = load_embedding_dict('ieee_zhihu_cup/word_embedding.txt')
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
 print('begin to process words')
 data_idx = [True] * data_topic.shape[0]
 
-<<<<<<< HEAD
 for i in tqdm(xrange(data_topic.shape[0])):
     if data_idx[i] == False:
         continue
 
     title_words = []
     desc_words = []
-=======
-# max_count_of_data_words = 0
-
-# for i in tqdm(xrange(data_topic.shape[0])):
-#     if data_idx[i] == False:
-#         continue
-
-#     title_words = []
-#     desc_words = []
-
-#     data = data_topic.iloc[i][0]
-#     desc = reader.iloc[i][4]
-
-#     if type(data) == str:
-#         title_words = data.split(',')
-
-#     if type(desc) == str:
-#         desc_words = desc.split(',')
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
     data = data_topic.iloc[i][0]
     desc = reader.iloc[i][4]
 
-<<<<<<< HEAD
     if type(data) == str:
         title_words = data.split(',')
 
     if type(desc) == str:
         desc_words = desc.split(',')
-=======
-#     filter_words = []
-#     for w in title_words:
-#         # if w in embedding_dict and w in word_counts:
-#         if w not in filter_word_list:
-#             filter_words.append(w)
-#             pass
-#         pass
-
-#     if len(filter_words) == 0:
-#         print('use desc words: ', title_words, desc_words)
-#         for w in desc_words:
-#             if w not in filter_word_list:
-#                 filter_words.append(w)
-#                 pass
-#             pass
->>>>>>> 1175eb6c677f0f6633cc29f3869477a905867402
 
     if type(data) != str and type(desc) != str:
         data_idx[i] = False
