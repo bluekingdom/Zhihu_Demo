@@ -13,6 +13,7 @@ from tqdm import tqdm
 from six.moves import xrange
 
 from cnn_text import TextCNN_normal
+from rnn_net import TextLSTM
 from utils import *
 #-----------------------------------------endding import package------------------------------------------#
 
@@ -151,13 +152,13 @@ def run_training(data_file = '', checkpoint_file = ''):
     l2_reg_lambda = FLAGS.l2_reg_lambda
 
     #---------------------------------------------define network---------------------------------------------#
-    cnn = TextCNN_normal(sequence_length, num_classes, vocab_size, 
-        embeddings, l2_reg_lambda)
+    # net = TextCNN_normal(sequence_length, num_classes, vocab_size, embeddings, l2_reg_lambda)
+    net = TextCNN_normal(sequence_length, num_classes, vocab_size, embeddings, l2_reg_lambda)
 
     # 定义优化器
     with tf.name_scope("optimizer"):
-        optimizer = tf.train.AdamOptimizer(FLAGS.lr).minimize(cnn.loss)
-        # optimizer = tf.train.GradientDescentOptimizer(FLAGS.lr).minimize(cnn.loss)
+        optimizer = tf.train.AdamOptimizer(FLAGS.lr).minimize(net.loss)
+        # optimizer = tf.train.GradientDescentOptimizer(FLAGS.lr).minimize(net.loss)
  
     # 定义saver，只保存最新的5个模型
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=FLAGS.num_checkpoints)
@@ -188,10 +189,10 @@ def run_training(data_file = '', checkpoint_file = ''):
 
             start = time.time()
             sess.run([optimizer], feed_dict={
-                cnn.input_x: x_batch, 
-                cnn.input_y: y_batch, 
-                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
-                cnn.is_train: True
+                net.input_x: x_batch, 
+                net.input_y: y_batch, 
+                net.dropout_keep_prob: FLAGS.dropout_keep_prob,
+                net.is_train: True
                 })
             train_time += (time.time() - start)
     
@@ -200,11 +201,11 @@ def run_training(data_file = '', checkpoint_file = ''):
 
                 test_start_time = time.time()
 
-                train_loss = sess.run(cnn.loss, feed_dict={
-                    cnn.input_x:x_batch, 
-                    cnn.input_y:y_batch, 
-                    cnn.dropout_keep_prob:1.0,
-                    cnn.is_train: False
+                train_loss = sess.run(net.loss, feed_dict={
+                    net.input_x:x_batch, 
+                    net.input_y:y_batch, 
+                    net.dropout_keep_prob:1.0,
+                    net.is_train: False
                     })
 
                 score = 0
@@ -215,11 +216,11 @@ def run_training(data_file = '', checkpoint_file = ''):
                 for test_batch in test_batches:
                     test_count += 1
                     x_dev_b, y_dev_b = zip(*test_batch)
-                    predict_5, label_5, _loss = sess.run([cnn.predict_top_5,cnn.label_top_5,cnn.loss], feed_dict={
-                        cnn.input_x:x_dev_b, 
-                        cnn.input_y:y_dev_b, 
-                        cnn.dropout_keep_prob: 1.0,
-                        cnn.is_train: False
+                    predict_5, label_5, _loss = sess.run([net.predict_top_5,net.label_top_5,net.loss], feed_dict={
+                        net.input_x:x_dev_b, 
+                        net.input_y:y_dev_b, 
+                        net.dropout_keep_prob: 1.0,
+                        net.is_train: False
                         })
 
                     predict_label_and_marked_label_list = []
